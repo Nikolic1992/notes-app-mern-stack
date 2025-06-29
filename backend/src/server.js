@@ -2,6 +2,7 @@ import express from "express";
 import notesRoutes from "./routes/notesRoutes.js";
 import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
+import rateLimiter from "./middleware/rateLimiter.js";
 
 // Install dotenv to manage environment variables ( .env file )
 dotenv.config();
@@ -12,15 +13,21 @@ const app = express();
 // Use the PORT environment variable or default to 5001 if not set
 const PORT = process.env.PORT || 5001;
 
-// Connect to the database
-connectDB();
-
 // Middleware to parse JSON request bodies
 app.use(express.json());
+// Middleware to limit the rate of incoming requests
+// This helps prevent abuse and ensures fair usage of the API
+// It should always be placed before the routes that it applies to
+app.use(rateLimiter);
+
 // Use the notes routes for all requests to /api/notes
 app.use("/api/notes", notesRoutes);
 
-// Listen for incoming requests on the specified port
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Connect to the database first before starting the server
+// This ensures that the server only starts if the database connection is successful
+connectDB().then(() => {
+  // Listen for incoming requests on the specified port
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
 });
