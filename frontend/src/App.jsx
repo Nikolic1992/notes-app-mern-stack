@@ -20,7 +20,7 @@ function App() {
           element={<HomePage theme={theme} setTheme={setTheme} />}
         />
         <Route path="/create" element={<CreateNotePage />} />
-        <Route path="/notes/:id" element={<NoteDetailsPage />} />
+        <Route path="/note/:id" element={<NoteDetailsPage />} />
       </Routes>
     </div>
   );
